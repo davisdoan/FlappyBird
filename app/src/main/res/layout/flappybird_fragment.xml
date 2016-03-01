@@ -12,16 +12,16 @@
 
         <ImageView
             android:id="@+id/top_pipe"
-            android:layout_width="80dp"
-            android:layout_height="200dp"
+            android:layout_width="70dp"
+            android:layout_height="180dp"
             android:layout_gravity="right|top"
             android:src="@drawable/pipes"
             />
 
         <ImageView
             android:id="@+id/bottom_pipe"
-            android:layout_width="80dp"
-            android:layout_height="160dp"
+            android:layout_width="70dp"
+            android:layout_height="150dp"
             android:layout_gravity="right|bottom"
             android:src="@drawable/pipes"
             />
@@ -31,13 +31,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bird_motion"
-            />
-        <ImageView
-            android:id="@+id/flappy_bird2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bird_motion"
-            android:layout_gravity="right|bottom"/>
+            android:layout_gravity="left|center_vertical"/>
+
     </FrameLayout>
 
     <FrameLayout
