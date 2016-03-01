@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.85"
+        android:background="@color/blue_sky">
+
+        <ImageView
+            android:id="@+id/top_pipe"
+            android:layout_width="80dp"
+            android:layout_height="200dp"
+            android:layout_gravity="right|top"
+            android:src="@drawable/pipes"
+            />
+
+        <ImageView
+            android:id="@+id/bottom_pipe"
+            android:layout_width="80dp"
+            android:layout_height="160dp"
+            android:layout_gravity="right|bottom"
+            android:src="@drawable/pipes"
+            />
+
+        <ImageView
+            android:id="@+id/flappy_bird"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bird_motion"
+            />
+        <ImageView
+            android:id="@+id/flappy_bird2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bird_motion"
+            android:layout_gravity="right|bottom"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/grass"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.025"
+        android:background="@color/light_green_grass">
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/floor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.125"
+        android:background="@color/tan_floor">
+    </FrameLayout>
+
+
+</LinearLayout>
+
+
