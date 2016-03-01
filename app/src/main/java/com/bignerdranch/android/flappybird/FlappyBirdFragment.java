@@ -1,5 +1,6 @@
 package com.bignerdranch.android.flappybird;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.drawable.AnimationDrawable;
@@ -10,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 public class FlappyBirdFragment extends Fragment{
@@ -21,7 +23,6 @@ public class FlappyBirdFragment extends Fragment{
     private View mBottomPipe;
     private AnimationDrawable birdAnimation;
     private boolean mPipeFlag;
-
     public static FlappyBirdFragment newInstance() { return new FlappyBirdFragment();}
 
     @Override
@@ -40,35 +41,6 @@ public class FlappyBirdFragment extends Fragment{
         mTopPipe = view.findViewById(R.id.top_pipe);
         mBottomPipe = view.findViewById(R.id.bottom_pipe);
 
-
-        mSceneView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                AnimatorSet animatorSet = new AnimatorSet();
-                ObjectAnimator birdDownAnimator = ObjectAnimator.ofFloat(mBirdScene, "y", mBirdScene.getHeight(), -3).setDuration(30);
-                ObjectAnimator birdUpAnimator = ObjectAnimator.ofFloat(mBirdScene, "y", v.getBottom(), v.getTop()).setDuration(30);
-                birdUpAnimator.setInterpolator(new AccelerateInterpolator());
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        animatorSet.play(birdDownAnimator);
-                        animatorSet.start();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-
-                        break;
-                    case MotionEvent.ACTION_UP:
-
-                        animatorSet.play(birdDownAnimator);
-                        animatorSet.start();
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                        break;
-
-                }
-                return true;
-            }
-        });
-
         mSceneView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,21 +49,44 @@ public class FlappyBirdFragment extends Fragment{
                 }
             }
         });
-
         return view;
     }
 
     private void startPipeAnimation() {
-        float topPipeXStart = mTopPipe.getX();
-        float bottomPipeXStart = mBottomPipe.getX();
+            float topPipeXStart = mTopPipe.getX();
+            float bottomPipeXStart = mBottomPipe.getX();
 
-        ObjectAnimator bottomWidthAnimator = ObjectAnimator.ofFloat(mTopPipe, "x", topPipeXStart,-250).setDuration(3000);
-        ObjectAnimator topWidthAnimator = ObjectAnimator.ofFloat(mBottomPipe, "x", bottomPipeXStart,-250).setDuration(3000);
+            ObjectAnimator bottomWidthAnimator = ObjectAnimator.ofFloat(mTopPipe, "x", topPipeXStart, -250).setDuration(3000);
+            ObjectAnimator topWidthAnimator = ObjectAnimator.ofFloat(mBottomPipe, "x", bottomPipeXStart, -250).setDuration(3000);
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.play(bottomWidthAnimator).with(topWidthAnimator);
-        mPipeFlag = true;
-        animatorSet.start();
+            bottomWidthAnimator.setInterpolator(new AccelerateInterpolator());
+            topWidthAnimator.setInterpolator(new AccelerateInterpolator());
 
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.play(bottomWidthAnimator).with(topWidthAnimator);
+
+            animatorSet.start();
     }
+
+    private Animator.AnimatorListener flyUpListener = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    };
 }
