@@ -8,30 +8,33 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.85"
-        android:background="@color/blue_sky">
+        android:background="@color/blue_sky"
+        >
 
         <ImageView
             android:id="@+id/top_pipe"
-            android:layout_width="70dp"
-            android:layout_height="180dp"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
             android:layout_gravity="right|top"
             android:src="@drawable/pipes"
             />
 
         <ImageView
             android:id="@+id/bottom_pipe"
-            android:layout_width="70dp"
-            android:layout_height="150dp"
+            android:layout_width="50dp"
+            android:layout_height="280dp"
             android:layout_gravity="right|bottom"
             android:src="@drawable/pipes"
             />
 
         <ImageView
             android:id="@+id/flappy_bird"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="34dp"
             android:background="@drawable/bird_motion"
-            android:layout_gravity="left|center_vertical"/>
+            android:layout_gravity="left|center_vertical"
+            android:adjustViewBounds="false"
+            />
 
     </FrameLayout>
 

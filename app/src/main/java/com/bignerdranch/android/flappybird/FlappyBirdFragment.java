@@ -103,7 +103,6 @@ public class FlappyBirdFragment extends Fragment{
         }
     };
 
-
     private void startPipeAnimation() {
             float topPipeXStart = mTopPipe.getX();
             float bottomPipeXStart = mBottomPipe.getX();
