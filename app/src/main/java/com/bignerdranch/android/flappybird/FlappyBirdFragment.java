@@ -3,13 +3,16 @@ package com.bignerdranch.android.flappybird;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
@@ -18,17 +21,18 @@ public class FlappyBirdFragment extends Fragment{
 
     private View mFloorView;
     private View mGrassView;
-    private View mSceneView;
+    private View mGameView;
     private View mTopPipe;
     private View mBottomPipe;
     private View mSkyView;
     private View mFlappyBird;
     private AnimationDrawable birdAnimation;
     private int startingSpot;
+    private int screenHeight;
     private Rect birdHitBox;
     private Rect topPipeHitBox;
     private Rect bottomPipeHitBox;
-    private boolean mPipeFlag;
+    private boolean mPipeStartedFlag;
     private boolean mFlyFlag;
     private boolean mCollsionFlag;
     private ObjectAnimator birdUpAnimator;
@@ -44,20 +48,25 @@ public class FlappyBirdFragment extends Fragment{
         this.birdAnimation = (AnimationDrawable) mFlappyBird.getBackground();
         birdAnimation.start();
 
-        mPipeFlag = false;
+        mPipeStartedFlag = false;
         mCollsionFlag = false;
         
-        mSceneView = view;
+        mGameView = view;
         mFloorView = view.findViewById(R.id.floor);
         mGrassView = view.findViewById(R.id.grass);
         mTopPipe = view.findViewById(R.id.top_pipe);
         mSkyView = view.findViewById(R.id.sky);
         mBottomPipe = view.findViewById(R.id.bottom_pipe);
 
+        WindowManager windowManager = (WindowManager) getActivity().getSystemService(getActivity().WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point screenSize = new Point();
+        display.getSize(screenSize);
+        screenHeight = screenSize.y;
+
         birdUpAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", -200);
         birdUpAnimator.setDuration(250);
         birdUpAnimator.setInterpolator(new DecelerateInterpolator());
-
         birdUpAnimator.addListener(flyUpListener);
 
         birdDownAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", 0);
@@ -68,18 +77,21 @@ public class FlappyBirdFragment extends Fragment{
         topPipeHitBox = new Rect(0,0,0,0);
         bottomPipeHitBox = new Rect(0,0,0,0);
 
-        mSceneView.setOnClickListener(new View.OnClickListener() {
+        mGameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPipeFlag == false) {
+                if (mPipeStartedFlag == false) {
                     startPipeAnimation();
                 }
                 if (birdUpAnimator.isStarted()) {
                     birdUpAnimator.cancel();
                 }
-
                 if (startingSpot == 0) {
                     startingSpot = mFlappyBird.getTop();
+                }
+
+                if (yIsOutOfBounds(mFlappyBird)) {
+
                 }
 
                 mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
@@ -97,7 +109,6 @@ public class FlappyBirdFragment extends Fragment{
         while(mCollsionFlag){
             CheckCollision(topPipeHitBox, bottomPipeHitBox, birdHitBox);
         }
-
         return view;
     }
 
@@ -113,7 +124,6 @@ public class FlappyBirdFragment extends Fragment{
                 mFlappyBird.setTranslationY(0);
 
                 birdDownAnimator.setFloatValues((mGrassView.getTop() - 100) - mFlappyBird.getTop());
-                //Toast.makeText(getActivity(), "Bird Starting is: " + startingSpot + " and bird transY is: " + mFlappyBird.getTranslationY() + "bird top is " + mFlappyBird.getTop() + " floor location on window is " + mGrassView.getTop(), Toast.LENGTH_SHORT).show();
                 birdDownAnimator.start();
             }
         }
@@ -134,13 +144,12 @@ public class FlappyBirdFragment extends Fragment{
 
             ObjectAnimator bottomWidthAnimator = ObjectAnimator.ofFloat(mTopPipe, "x", topPipeXStart, -250).setDuration(3000);
             ObjectAnimator topWidthAnimator = ObjectAnimator.ofFloat(mBottomPipe, "x", bottomPipeXStart, -250).setDuration(3000);
-
             bottomWidthAnimator.setInterpolator(new AccelerateInterpolator());
             topWidthAnimator.setInterpolator(new AccelerateInterpolator());
 
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.play(bottomWidthAnimator).with(topWidthAnimator);
-            mPipeFlag = true;
+            mPipeStartedFlag = true;
             animatorSet.start();
     }
 
@@ -149,5 +158,24 @@ public class FlappyBirdFragment extends Fragment{
             Toast.makeText(getActivity(), "COLLISION!!!!! ", Toast.LENGTH_SHORT).show();
             mCollsionFlag = true;
         }
+    }
+
+    private boolean yIsOutOfBounds(View view){
+        float y = view.getY();
+        if( y < 0){
+            birdUpAnimator.cancel();
+            birdDownAnimator.setFloatValues((mGrassView.getTop() - 200) - mFlappyBird.getTop());
+            birdDownAnimator.start();
+            Toast.makeText(getActivity(), "out of bounds!!!!! ", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if( y + view.getHeight() + 150 > screenHeight){
+            birdUpAnimator.cancel();
+            birdDownAnimator.setFloatValues((mGrassView.getTop() - 200) - mFlappyBird.getTop());
+            birdDownAnimator.start();
+            Toast.makeText(getActivity(), "out of bounds!!!!! ", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 }
