@@ -5,6 +5,7 @@
               android:layout_height="match_parent">
 
     <FrameLayout
+        android:id="@+id/sky"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.85"
@@ -38,21 +39,23 @@
 
     </FrameLayout>
 
-    <FrameLayout
+    <View
         android:id="@+id/grass"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.025"
-        android:background="@color/light_green_grass">
-    </FrameLayout>
+        android:background="@color/light_green_grass"
+        android:visibility="visible">
+    </View>
 
-    <FrameLayout
+    <View
         android:id="@+id/floor"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.125"
-        android:background="@color/tan_floor">
-    </FrameLayout>
+        android:background="@color/tan_floor"
+        android:visibility="visible">
+    </View>
 
 
 </LinearLayout>

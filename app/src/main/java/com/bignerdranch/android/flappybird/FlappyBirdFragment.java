@@ -3,6 +3,8 @@ package com.bignerdranch.android.flappybird;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class FlappyBirdFragment extends Fragment{
 
@@ -20,6 +23,7 @@ public class FlappyBirdFragment extends Fragment{
     private View mSceneView;
     private View mTopPipe;
     private View mBottomPipe;
+    private View mSkyView;
     private View mBirdScene;
     private AnimationDrawable birdAnimation;
     private int startingSpot;
@@ -44,6 +48,7 @@ public class FlappyBirdFragment extends Fragment{
         mFloorView = view.findViewById(R.id.floor);
         mGrassView = view.findViewById(R.id.grass);
         mTopPipe = view.findViewById(R.id.top_pipe);
+        mSkyView = view.findViewById(R.id.sky);
         mBottomPipe = view.findViewById(R.id.bottom_pipe);
 
         birdUpAnimator = ObjectAnimator.ofFloat(mBirdScene, "translationY", -200);
@@ -52,7 +57,7 @@ public class FlappyBirdFragment extends Fragment{
         birdUpAnimator.addListener(flyUpListener);
 
         birdDownAnimator = ObjectAnimator.ofFloat(mBirdScene, "translationY", 0);
-        birdDownAnimator.setDuration(250);
+        birdDownAnimator.setDuration(550);
         birdDownAnimator.setInterpolator(new AccelerateInterpolator());
 
         mSceneView.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +76,7 @@ public class FlappyBirdFragment extends Fragment{
 
                 mBirdScene.layout(mBirdScene.getLeft(), (int) mBirdScene.getY(), mBirdScene.getRight(), (int) mBirdScene.getY() + mBirdScene.getMeasuredHeight());
                 mBirdScene.setTranslationY(0);
+
                 mFlyFlag = false;
                 birdUpAnimator.start();
             }
@@ -86,9 +92,11 @@ public class FlappyBirdFragment extends Fragment{
         @Override
         public void onAnimationEnd(Animator animation) {
             if(!mFlyFlag){
-                mBirdScene.layout(mBirdScene.getLeft(),(int)mBirdScene.getY(), mBirdScene.getRight(), (int)mBirdScene.getY() + mBirdScene.getMeasuredHeight());
+                mBirdScene.layout(mBirdScene.getLeft(), (int) mBirdScene.getY(), mBirdScene.getRight(), (int) mBirdScene.getY() + mBirdScene.getMeasuredHeight());
                 mBirdScene.setTranslationY(0);
-                birdDownAnimator.setFloatValues(startingSpot - mBirdScene.getTop());
+
+                birdDownAnimator.setFloatValues((mGrassView.getTop() - 100) - mBirdScene.getTop());
+                Toast.makeText(getActivity(), "Bird Starting is: " + startingSpot + " and bird transY is: " + mBirdScene.getTranslationY() + "bird top is " + mBirdScene.getTop() + " floor location on window is " + mGrassView.getTop(), Toast.LENGTH_SHORT).show();
                 birdDownAnimator.start();
             }
         }
