@@ -30,9 +30,9 @@ public class FlappyBirdFragment extends Fragment{
     private Rect bottomPipeHitBox;
     private boolean mPipeFlag;
     private boolean mFlyFlag;
+    private boolean mCollsionFlag;
     private ObjectAnimator birdUpAnimator;
     private ObjectAnimator birdDownAnimator;
-
 
     public static FlappyBirdFragment newInstance() { return new FlappyBirdFragment();}
 
@@ -44,8 +44,8 @@ public class FlappyBirdFragment extends Fragment{
         this.birdAnimation = (AnimationDrawable) mFlappyBird.getBackground();
         birdAnimation.start();
 
-
         mPipeFlag = false;
+        mCollsionFlag = false;
         
         mSceneView = view;
         mFloorView = view.findViewById(R.id.floor);
@@ -68,8 +68,6 @@ public class FlappyBirdFragment extends Fragment{
         topPipeHitBox = new Rect(0,0,0,0);
         bottomPipeHitBox = new Rect(0,0,0,0);
 
-
-
         mSceneView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,12 +89,14 @@ public class FlappyBirdFragment extends Fragment{
                 topPipeHitBox.set((int) mTopPipe.getX(), (int) mBottomPipe.getY(), mBottomPipe.getWidth(), mBottomPipe.getHeight());
                 bottomPipeHitBox.set((int) mBottomPipe.getX(), (int) mTopPipe.getY(), mBottomPipe.getWidth(), mBottomPipe.getHeight());
 
-                CheckCollision(topPipeHitBox, bottomPipeHitBox, birdHitBox);
                 mFlyFlag = false;
                 birdUpAnimator.start();
-
             }
         });
+
+        while(mCollsionFlag){
+            CheckCollision(topPipeHitBox, bottomPipeHitBox, birdHitBox);
+        }
 
         return view;
     }
@@ -147,8 +147,7 @@ public class FlappyBirdFragment extends Fragment{
     public void CheckCollision(Rect topRect, Rect lowerRect, Rect mainRect){
         if(topRect.intersect(mainRect) || lowerRect.intersect(mainRect)){
             Toast.makeText(getActivity(), "COLLISION!!!!! ", Toast.LENGTH_SHORT).show();
+            mCollsionFlag = true;
         }
     }
-
-
 }
