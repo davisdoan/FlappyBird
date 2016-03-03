@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 public class FlappyBirdFragment extends Fragment{
@@ -24,13 +22,17 @@ public class FlappyBirdFragment extends Fragment{
     private View mTopPipe;
     private View mBottomPipe;
     private View mSkyView;
-    private View mBirdScene;
+    private View mFlappyBird;
     private AnimationDrawable birdAnimation;
     private int startingSpot;
+    private Rect birdHitBox;
+    private Rect topPipeHitBox;
+    private Rect bottomPipeHitBox;
     private boolean mPipeFlag;
     private boolean mFlyFlag;
     private ObjectAnimator birdUpAnimator;
     private ObjectAnimator birdDownAnimator;
+
 
     public static FlappyBirdFragment newInstance() { return new FlappyBirdFragment();}
 
@@ -38,9 +40,10 @@ public class FlappyBirdFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle onSavedInstanceState){
         View view = inflater.inflate(R.layout.flappybird_fragment, container, false);
 
-        mBirdScene = (ImageView) view.findViewById(R.id.flappy_bird);
-        this.birdAnimation = (AnimationDrawable) mBirdScene.getBackground();
+        mFlappyBird = view.findViewById(R.id.flappy_bird);
+        this.birdAnimation = (AnimationDrawable) mFlappyBird.getBackground();
         birdAnimation.start();
+
 
         mPipeFlag = false;
         
@@ -51,14 +54,21 @@ public class FlappyBirdFragment extends Fragment{
         mSkyView = view.findViewById(R.id.sky);
         mBottomPipe = view.findViewById(R.id.bottom_pipe);
 
-        birdUpAnimator = ObjectAnimator.ofFloat(mBirdScene, "translationY", -200);
+        birdUpAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", -200);
         birdUpAnimator.setDuration(250);
         birdUpAnimator.setInterpolator(new DecelerateInterpolator());
+
         birdUpAnimator.addListener(flyUpListener);
 
-        birdDownAnimator = ObjectAnimator.ofFloat(mBirdScene, "translationY", 0);
+        birdDownAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", 0);
         birdDownAnimator.setDuration(550);
         birdDownAnimator.setInterpolator(new AccelerateInterpolator());
+
+        birdHitBox = new Rect(0,0,0,0);
+        topPipeHitBox = new Rect(0,0,0,0);
+        bottomPipeHitBox = new Rect(0,0,0,0);
+
+
 
         mSceneView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,21 +76,28 @@ public class FlappyBirdFragment extends Fragment{
                 if (mPipeFlag == false) {
                     startPipeAnimation();
                 }
-                if(birdUpAnimator.isStarted()){
+                if (birdUpAnimator.isStarted()) {
                     birdUpAnimator.cancel();
                 }
 
-                if(startingSpot == 0) {
-                    startingSpot = mBirdScene.getTop();
+                if (startingSpot == 0) {
+                    startingSpot = mFlappyBird.getTop();
                 }
 
-                mBirdScene.layout(mBirdScene.getLeft(), (int) mBirdScene.getY(), mBirdScene.getRight(), (int) mBirdScene.getY() + mBirdScene.getMeasuredHeight());
-                mBirdScene.setTranslationY(0);
+                mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
+                mFlappyBird.setTranslationY(0);
 
+                birdHitBox.set((int) mFlappyBird.getX(), (int) mFlappyBird.getY(), mFlappyBird.getWidth(), mFlappyBird.getHeight());
+                topPipeHitBox.set((int) mTopPipe.getX(), (int) mBottomPipe.getY(), mBottomPipe.getWidth(), mBottomPipe.getHeight());
+                bottomPipeHitBox.set((int) mBottomPipe.getX(), (int) mTopPipe.getY(), mBottomPipe.getWidth(), mBottomPipe.getHeight());
+
+                CheckCollision(topPipeHitBox, bottomPipeHitBox, birdHitBox);
                 mFlyFlag = false;
                 birdUpAnimator.start();
+
             }
         });
+
         return view;
     }
 
@@ -92,11 +109,11 @@ public class FlappyBirdFragment extends Fragment{
         @Override
         public void onAnimationEnd(Animator animation) {
             if(!mFlyFlag){
-                mBirdScene.layout(mBirdScene.getLeft(), (int) mBirdScene.getY(), mBirdScene.getRight(), (int) mBirdScene.getY() + mBirdScene.getMeasuredHeight());
-                mBirdScene.setTranslationY(0);
+                mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
+                mFlappyBird.setTranslationY(0);
 
-                birdDownAnimator.setFloatValues((mGrassView.getTop() - 100) - mBirdScene.getTop());
-                Toast.makeText(getActivity(), "Bird Starting is: " + startingSpot + " and bird transY is: " + mBirdScene.getTranslationY() + "bird top is " + mBirdScene.getTop() + " floor location on window is " + mGrassView.getTop(), Toast.LENGTH_SHORT).show();
+                birdDownAnimator.setFloatValues((mGrassView.getTop() - 100) - mFlappyBird.getTop());
+                //Toast.makeText(getActivity(), "Bird Starting is: " + startingSpot + " and bird transY is: " + mFlappyBird.getTranslationY() + "bird top is " + mFlappyBird.getTop() + " floor location on window is " + mGrassView.getTop(), Toast.LENGTH_SHORT).show();
                 birdDownAnimator.start();
             }
         }
@@ -125,6 +142,12 @@ public class FlappyBirdFragment extends Fragment{
             animatorSet.play(bottomWidthAnimator).with(topWidthAnimator);
             mPipeFlag = true;
             animatorSet.start();
+    }
+
+    public void CheckCollision(Rect topRect, Rect lowerRect, Rect mainRect){
+        if(topRect.intersect(mainRect) || lowerRect.intersect(mainRect)){
+            Toast.makeText(getActivity(), "COLLISION!!!!! ", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
