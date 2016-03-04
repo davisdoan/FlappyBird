@@ -37,6 +37,7 @@ public class FlappyBirdFragment extends Fragment{
     private boolean mCollsionFlag;
     private ObjectAnimator birdUpAnimator;
     private ObjectAnimator birdDownAnimator;
+    private AnimatorSet pipeAnimatorSet;
 
     public static FlappyBirdFragment newInstance() { return new FlappyBirdFragment();}
 
@@ -64,6 +65,10 @@ public class FlappyBirdFragment extends Fragment{
         display.getSize(screenSize);
         screenHeight = screenSize.y;
 
+        birdHitBox = new Rect(0,0,0,0);
+        topPipeHitBox = new Rect(0,0,0,0);
+        bottomPipeHitBox = new Rect(0,0,0,0);
+
         birdUpAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", -200);
         birdUpAnimator.setDuration(250);
         birdUpAnimator.setInterpolator(new DecelerateInterpolator());
@@ -72,10 +77,6 @@ public class FlappyBirdFragment extends Fragment{
         birdDownAnimator = ObjectAnimator.ofFloat(mFlappyBird, "translationY", 0);
         birdDownAnimator.setDuration(550);
         birdDownAnimator.setInterpolator(new AccelerateInterpolator());
-
-        birdHitBox = new Rect(0,0,0,0);
-        topPipeHitBox = new Rect(0,0,0,0);
-        bottomPipeHitBox = new Rect(0,0,0,0);
 
         mGameView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,11 +90,9 @@ public class FlappyBirdFragment extends Fragment{
                 if (startingSpot == 0) {
                     startingSpot = mFlappyBird.getTop();
                 }
-
                 if (yIsOutOfBounds(mFlappyBird)) {
-
+                    // end the game
                 }
-
                 mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
                 mFlappyBird.setTranslationY(0);
 
@@ -105,10 +104,6 @@ public class FlappyBirdFragment extends Fragment{
                 birdUpAnimator.start();
             }
         });
-
-        while(mCollsionFlag){
-            CheckCollision(topPipeHitBox, bottomPipeHitBox, birdHitBox);
-        }
         return view;
     }
 
@@ -123,7 +118,7 @@ public class FlappyBirdFragment extends Fragment{
                 mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
                 mFlappyBird.setTranslationY(0);
 
-                birdDownAnimator.setFloatValues((mGrassView.getTop() - 100) - mFlappyBird.getTop());
+                birdDownAnimator.setFloatValues(mGrassView.getTop()  - mFlappyBird.getTop());
                 birdDownAnimator.start();
             }
         }
@@ -147,9 +142,11 @@ public class FlappyBirdFragment extends Fragment{
             bottomPipehAnimator.setInterpolator(new AccelerateInterpolator());
             topPipeAnimator.setInterpolator(new AccelerateInterpolator());
 
-            AnimatorSet pipeAnimatorSet = new AnimatorSet();
+            pipeAnimatorSet = new AnimatorSet();
             pipeAnimatorSet.play(bottomPipehAnimator).with(topPipeAnimator);
+
             mPipeStartedFlag = true;
+
             pipeAnimatorSet.start();
     }
 
@@ -162,22 +159,12 @@ public class FlappyBirdFragment extends Fragment{
 
     private boolean yIsOutOfBounds(View view){
         float y = view.getY();
-        if( y < 0){
-            mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
-            mFlappyBird.setTranslationY(0);
-
-            birdUpAnimator.setFloatValues((mSkyView.getTop() - 100) - mFlappyBird.getTop());
-            birdUpAnimator.start();
-            Toast.makeText(getActivity(), "out of bounds!!!!! ", Toast.LENGTH_SHORT).show();
+        if( y < 0 || (y < 1600 && y > 1345)){
+            Toast.makeText(getActivity(), "out of bounds!!!!! top" + "y is: " + y + "grass top is " + mGrassView.getTop(), Toast.LENGTH_SHORT).show();
             return true;
         }
         if( y + view.getHeight() + 150 > screenHeight){
-            mFlappyBird.layout(mFlappyBird.getLeft(), (int) mFlappyBird.getY(), mFlappyBird.getRight(), (int) mFlappyBird.getY() + mFlappyBird.getMeasuredHeight());
-            mFlappyBird.setTranslationY(0);
-
-            birdUpAnimator.setFloatValues((mSkyView.getTop() - 100) - mFlappyBird.getTop());
-            birdUpAnimator.start();
-            Toast.makeText(getActivity(), "out of bounds!!!!! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "out of bounds!!!!! bottom" + "y is: " + y, Toast.LENGTH_SHORT).show();
             return true;
         }
         return false;
